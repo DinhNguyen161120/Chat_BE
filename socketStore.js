@@ -22,10 +22,21 @@ const removeConnect = (socketId) => {
     console.log('delete connected user')
 }
 
+const checkUserExit = (userId) => {
+    let check = false
+    connectedUsers.forEach((value, key) => {
+        if (value === userId) {
+            check = true
+        }
+    })
+    return check
+}
+
 
 module.exports = {
     setInstantSocket,
     addNewConnectedUser,
     getInstantSocket,
-    removeConnect
+    removeConnect,
+    checkUserExit
 }

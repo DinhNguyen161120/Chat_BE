@@ -21,6 +21,15 @@ const userSchema = new Schema({
     },
     status: {
         type: String
+    },
+    avatar: {
+        type: String
+    },
+    sex: {
+        type: String
+    },
+    birthday: {
+        type: Date
     }
 })
 

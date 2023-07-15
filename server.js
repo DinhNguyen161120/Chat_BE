@@ -7,13 +7,15 @@ require('dotenv').config()
 const socketServer = require('./socketServer')
 
 const authRoutes = require('./routes/authRoutes')
+const userRoutes = require('./routes/userRoutes')
 
 const port = process.env.PORT
 
 app.use(express.json())
 app.use(cors())
-
+app.use(express.static('public'))
 app.use('/auth', authRoutes)
+app.use('/user', userRoutes)
 
 app.get('/', (req, res) => {
     res.send('Hello World!')

@@ -17,6 +17,18 @@ const registerSocketServer = (server) => {
         authSocket(socket, next)
     })
 
+    io.use((socket, next) => {
+
+        const userDetails = socket.handshake.auth?.userDetails
+        const check = socketStore.checkUserExit(userDetails._id)
+        if (check) {
+            const socketError = new Error("UserConnected")
+            next(socketError)
+        } else {
+            next()
+        }
+    })
+
     socketStore.setInstantSocket(io)
 
     io.on('connection', (socket) => {

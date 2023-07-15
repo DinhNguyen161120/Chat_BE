@@ -65,6 +65,8 @@ const login = async (req, res) => {
             lastName: user.lastName,
             role: user.role,
             status: user.status,
+            avatar: user.avatar,
+            birthday: user.birthday
         }
 
         return res.status(200).json(userDetails)

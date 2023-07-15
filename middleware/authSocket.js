@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken')
 
 const verifyTokenSocket = async (socket, next) => {
-    const token = socket.handshake.auth?.token
 
     try {
+        const token = socket.handshake.auth?.token
         const decoded = jwt.verify(token, process.env.KEY_TOKEN)
         socket.userDetails = decoded
     } catch (err) {
