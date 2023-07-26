@@ -19,6 +19,10 @@ const userSchema = new Schema({
     role: {
         type: String
     },
+    friends: [{
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    }],
     status: {
         type: String
     },

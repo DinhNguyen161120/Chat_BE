@@ -20,6 +20,7 @@ const register = async (req, res) => {
             role: 'user',
             firstName: firstName,
             lastName: lastName,
+            birthday: new Date(),
             status: '0' // is active
         })
 

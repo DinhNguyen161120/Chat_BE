@@ -4,6 +4,8 @@ const { Server } = require('socket.io')
 const authSocket = require('./middleware/authSocket')
 const socketStore = require('./socketStore')
 const handleNewConnected = require('./socketHandle/handleNewConnect')
+const conversationUpdate = require('./socketHandle/update/conversation')
+const messageUpdate = require('./socketHandle/handleDirectMessage')
 
 const registerSocketServer = (server) => {
     const io = new Server(server, {
@@ -20,7 +22,7 @@ const registerSocketServer = (server) => {
     io.use((socket, next) => {
 
         const userDetails = socket.handshake.auth?.userDetails
-        const check = socketStore.checkUserExit(userDetails._id)
+        const check = socketStore.checkUserOnline(userDetails._id)
         if (check) {
             const socketError = new Error("UserConnected")
             next(socketError)
@@ -35,10 +37,15 @@ const registerSocketServer = (server) => {
         const userDetails = socket.handshake.auth?.userDetails
         handleNewConnected(socket, userDetails)
 
+        conversationUpdate.updateConversation(userDetails._id)
 
 
         socket.on('disconnect', () => {
             socketStore.removeConnect(socket.id)
+        })
+
+        socket.on('send-message', (data) => {
+            messageUpdate.handleDirectMessage(data)
         })
     })
 }

@@ -8,6 +8,7 @@ const socketServer = require('./socketServer')
 
 const authRoutes = require('./routes/authRoutes')
 const userRoutes = require('./routes/userRoutes')
+const friendRoutes = require('./routes/friendInvitationRoutes')
 
 const port = process.env.PORT
 
@@ -16,6 +17,7 @@ app.use(cors())
 app.use(express.static('public'))
 app.use('/auth', authRoutes)
 app.use('/user', userRoutes)
+app.use('/friend', friendRoutes)
 
 app.get('/', (req, res) => {
     res.send('Hello World!')
