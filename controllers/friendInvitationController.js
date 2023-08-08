@@ -75,6 +75,8 @@ const acceptInvitation = async (req, res) => {
 
         await FriendInvitation.findByIdAndDelete(invitationId)
         friendUpdates.updateFriendPendingInvitation(receiverId.toString())
+        friendUpdates.updateListFriends(receiverId.toString())
+        friendUpdates.updateListFriends(senderId.toString())
 
         const firstMessage = await Message.create({
             senderId: senderId,
