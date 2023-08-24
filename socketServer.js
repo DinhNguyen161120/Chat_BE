@@ -7,6 +7,7 @@ const handleNewConnected = require('./socketHandle/handleNewConnect')
 const conversationUpdate = require('./socketHandle/update/conversation')
 const messageUpdate = require('./socketHandle/handleDirectMessage')
 const friendUpdate = require('./socketHandle/update/friend')
+const updateMessage = require('./socketHandle/update/message')
 
 const registerSocketServer = (server) => {
     const io = new Server(server, {
@@ -28,6 +29,8 @@ const registerSocketServer = (server) => {
 
         conversationUpdate.updateConversation(userDetails._id)
         friendUpdate.updateListFriends(userDetails._id)
+        let activeConnections = socketStore.getAllActiveConnections()
+        socket.emit('all-active-user', { activeUsers: activeConnections })
 
         socket.on('disconnect', () => {
             console.log('disconnect')
@@ -38,6 +41,19 @@ const registerSocketServer = (server) => {
             // console.log('send mesage', data)
             messageUpdate.handleDirectMessage(data)
         })
+        socket.on('message-watched', (data) => {
+            let { senderId, receiverId, conversationId } = data
+            updateMessage.updateWatchedMessageStatus(senderId, receiverId, conversationId)
+        })
+        socket.on('message-received', (data) => {
+            let { senderId, receiverId, conversationId } = data
+            updateMessage.updateReceivedMessageStatus(senderId, receiverId, conversationId)
+        })
+
+        setInterval(() => {
+            let activeConnections = socketStore.getAllActiveConnections()
+            socket.emit('all-active-user', { activeUsers: activeConnections })
+        }, 10000)
     })
 }
 

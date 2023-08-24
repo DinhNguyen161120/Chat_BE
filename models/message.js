@@ -26,6 +26,9 @@ const messageSchema = new Schema({
     },
     date: {
         type: Date
+    },
+    status: {
+        type: String
     }
 })
 

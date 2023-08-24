@@ -2,31 +2,50 @@
 const Message = require('../models/message')
 const Conversation = require('../models/conversation')
 const conversationUpdate = require('../socketHandle/update/conversation')
+const socketStore = require('../socketStore')
+const updateStatusMessage = require('./update/conversation')
 
 const handleDirectMessage = async (messageData) => {
     try {
-        const { senderId, receiverId, content, type, date } = messageData
+        let { senderId, receiverId, content, type, date, status } = messageData
+        status = 1
+        // cap nhat trang thai message dua tren hoat dong cua user
+
+        let check = socketStore.checkUserOnline(receiverId)
+        if (check) {
+            status = 2
+        }
+
         let message = await Message.create({
             senderId,
             receiverId,
             content,
             type,
-            date
+            date,
+            status
         })
 
         let conversation = await Conversation.findOne({
             participants: { $all: [senderId, receiverId] }
         })
+        let conversationId = ''
         if (conversation) {
+            conversationId = conversation._id
             conversation.messages.push(message._id)
             await conversation.save()
         } else {
-            await Conversation.create({
+            let newConversation = await Conversation.create({
                 participants: [senderId, receiverId],
                 messages: [message._id]
             })
+            conversationId = newConversation._id
         }
-        conversationUpdate.updateConversation(senderId)
+        if (status === 1) {
+            updateStatusMessage.updateSentMessageStatusInReduxStore(senderId, receiverId, conversationId)
+        } else if (status === 2) {
+            updateStatusMessage.updateReceivedMessageStatusInReduxStore(senderId, receiverId, conversationId)
+        }
+
         conversationUpdate.updateConversation(receiverId)
 
     } catch (err) {
