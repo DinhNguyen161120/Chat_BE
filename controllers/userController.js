@@ -1,6 +1,4 @@
-
 const User = require('../models/users')
-
 
 const updateInfo = async (req, res) => {
     try {
@@ -11,9 +9,7 @@ const updateInfo = async (req, res) => {
         user.avatar = userDetails.avatar
         user.birthday = userDetails.birthday
         user.sex = userDetails.sex
-
         await user.save()
-
         return res.status(200).send('Update success')
     } catch (err) {
         console.log(err)

@@ -15,7 +15,9 @@ const storage = multer.diskStorage({
         cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname))
     }
 })
+
 const upload = multer({ storage: storage })
+
 router.post('/upload-avatar', upload.single('avatar'), (req, res) => {
     try {
         const { destination, filename } = req.file

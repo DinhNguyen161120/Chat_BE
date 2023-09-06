@@ -1,5 +1,3 @@
-
-
 const socketStore = require('../../socketStore')
 const FriendInvitation = require('../../models/friendInvitation')
 const User = require('../../models/users')
@@ -28,6 +26,5 @@ const updateListFriends = async (userId) => {
 }
 
 module.exports = {
-    updateFriendPendingInvitation,
-    updateListFriends
+    updateFriendPendingInvitation, updateListFriends
 }

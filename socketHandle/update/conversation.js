@@ -1,4 +1,3 @@
-
 const Conversation = require('../../models/conversation')
 const socketStore = require('../../socketStore')
 
@@ -34,6 +33,7 @@ const updateSentMessageStatusInReduxStore = (senderId, receiverId, conversationI
         io.to(socketId).emit('update-sent-status-message-in-redux-store', { senderId, receiverId, conversationId })
     }
 }
+
 const updateReceivedMessageStatusInReduxStore = (senderId, receiverId, conversationId) => {
     let check = socketStore.checkUserOnline(senderId)
     if (check) {
@@ -42,7 +42,8 @@ const updateReceivedMessageStatusInReduxStore = (senderId, receiverId, conversat
         io.to(socketId).emit('update-received-status-message-in-redux-store', { senderId, receiverId, conversationId })
     }
 }
+
 module.exports = {
-    updateConversation, updateWatchedMessageStatusInReduxStore, updateSentMessageStatusInReduxStore,
-    updateReceivedMessageStatusInReduxStore
+    updateConversation, updateWatchedMessageStatusInReduxStore,
+    updateSentMessageStatusInReduxStore, updateReceivedMessageStatusInReduxStore
 }

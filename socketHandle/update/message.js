@@ -1,4 +1,3 @@
-
 const Message = require('../../models/message')
 const conversation = require('../update/conversation')
 
@@ -10,6 +9,7 @@ const updateWatchedMessageStatus = async (senderId, receiverId, conversationId) 
         console.log(err, 'updateWatchedMessageStatus')
     }
 }
+
 const updateReceivedMessageStatus = async (senderId, receiverId, conversationId) => {
     try {
         await Message.updateMany({ receiverId, senderId, status: 1 }, { status: 2 })

@@ -1,4 +1,3 @@
-
 const Message = require('../models/message')
 const Conversation = require('../models/conversation')
 const conversationUpdate = require('../socketHandle/update/conversation')
@@ -9,8 +8,8 @@ const handleDirectMessage = async (messageData) => {
     try {
         let { senderId, receiverId, content, type, date, status } = messageData
         status = 1
-        // cap nhat trang thai message dua tren hoat dong cua user
 
+        // cap nhat trang thai message dua tren hoat dong cua user
         let check = socketStore.checkUserOnline(receiverId)
         if (check) {
             status = 2
@@ -45,9 +44,7 @@ const handleDirectMessage = async (messageData) => {
         } else if (status === 2) {
             updateStatusMessage.updateReceivedMessageStatusInReduxStore(senderId, receiverId, conversationId)
         }
-
         conversationUpdate.updateConversation(receiverId)
-
     } catch (err) {
         console.log(err, 'sockethandle/update/message.js')
     }
