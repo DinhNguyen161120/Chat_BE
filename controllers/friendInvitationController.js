@@ -68,7 +68,8 @@ const acceptInvitation = async (req, res) => {
             receiverId: receiverId,
             isAnnounceFromServer: true,
             typeAnnounce: 'acceptFriend',
-            date: new Date()
+            date: new Date(),
+            status: 2     //0: dang gui, 1: da gui, 2: da nhan, 3: da xem.
         })
 
         const firstConversation = await Conversation.create({
