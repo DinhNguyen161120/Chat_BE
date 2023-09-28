@@ -8,7 +8,8 @@ const socketServer = require('./socketServer')
 
 const authRoutes = require('./routes/authRoutes')
 const userRoutes = require('./routes/userRoutes')
-const friendRoutes = require('./routes/friendInvitationRoutes')
+const friendRoutes = require('./routes/friendRoutes')
+const conversationRoutes = require('./routes/conversationRoutes')
 
 const port = process.env.PORT
 
@@ -18,6 +19,7 @@ app.use(express.static('public'))
 app.use('/auth', authRoutes)
 app.use('/user', userRoutes)
 app.use('/friend', friendRoutes)
+app.use('/conversation', conversationRoutes)
 
 app.get('/', (req, res) => {
     res.send('Hello World!')

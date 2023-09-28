@@ -56,7 +56,8 @@ const login = async (req, res) => {
             role: user.role,
             status: user.status,
             avatar: user.avatar,
-            birthday: user.birthday
+            birthday: user.birthday,
+            friends: user.friends
         }
         return res.status(200).json(userDetails)
     } catch (err) {
@@ -66,21 +67,26 @@ const login = async (req, res) => {
 }
 
 const refreshToken = (req, res) => {
-    const { userDetails } = req.body
-    userDetails.token = '123'
-    const token = jwt.sign(
-        {
-            ...userDetails
-        },
-        process.env.KEY_TOKEN
-        , {
-            expiresIn: process.env.EXPIRE_TOKEN
-        })
-    const newUserDetails = {
-        ...userDetails,
-        token: token
+    try {
+        const { userDetails } = req.body
+        userDetails.token = '1234'
+        const token = jwt.sign(
+            {
+                ...userDetails
+            },
+            process.env.KEY_TOKEN
+            , {
+                expiresIn: process.env.EXPIRE_TOKEN
+            })
+        const newUserDetails = {
+            ...userDetails,
+            token: token
+        }
+        return res.status(201).json({ userDetails: newUserDetails })
+    } catch (err) {
+        console.log(err, 'refresh token')
+        return res.status(500).send('Error on server')
     }
-    return res.status(201).json(newUserDetails)
 }
 
 module.exports = {

@@ -8,7 +8,6 @@ const handleDirectMessage = async (messageData) => {
     try {
         let { senderId, receiverId, content, type, date, status } = messageData
         status = 1
-
         // cap nhat trang thai message dua tren hoat dong cua user
         let check = socketStore.checkUserOnline(receiverId)
         if (check) {
@@ -25,7 +24,10 @@ const handleDirectMessage = async (messageData) => {
         })
 
         let conversation = await Conversation.findOne({
-            participants: { $all: [senderId, receiverId] }
+            $or: [
+                { participants: [senderId, receiverId] },
+                { participants: [receiverId, senderId] }
+            ]
         })
         let conversationId = ''
         if (conversation) {
@@ -35,7 +37,8 @@ const handleDirectMessage = async (messageData) => {
         } else {
             let newConversation = await Conversation.create({
                 participants: [senderId, receiverId],
-                messages: [message._id]
+                messages: [message._id],
+                date: new Date()
             })
             conversationId = newConversation._id
         }

@@ -8,6 +8,7 @@ const conversationUpdate = require('./socketHandle/update/conversation')
 const messageUpdate = require('./socketHandle/handleDirectMessage')
 const friendUpdate = require('./socketHandle/update/friend')
 const updateMessage = require('./socketHandle/update/message')
+const jwt = require('jsonwebtoken')
 
 const registerSocketServer = (server) => {
     const io = new Server(server, {
@@ -33,12 +34,10 @@ const registerSocketServer = (server) => {
         socket.emit('all-active-user', { activeUsers: activeConnections })
 
         socket.on('disconnect', () => {
-            console.log('disconnect')
             socketStore.removeConnect(socket.id)
         })
 
         socket.on('send-message', (data) => {
-            // console.log('send mesage', data)
             messageUpdate.handleDirectMessage(data)
         })
         socket.on('message-watched', (data) => {
@@ -49,11 +48,45 @@ const registerSocketServer = (server) => {
             let { senderId, receiverId, conversationId } = data
             updateMessage.updateReceivedMessageStatus(senderId, receiverId, conversationId)
         })
+        socket.on('check-token-expire', (userDetails) => {
+            let connect = socketStore.getConnectedUser()
+            console.log(connect)
+            try {
+                const decoded = jwt.verify(userDetails.token, process.env.KEY_TOKEN)
+                let userId = userDetails._id
+                let socketId = socketStore.getSocketIdFromUserId(userId)
+                userDetails.token = '1234'
+                const token = jwt.sign(
+                    {
+                        ...userDetails
+                    },
+                    process.env.KEY_TOKEN
+                    , {
+                        expiresIn: process.env.EXPIRE_TOKEN
+                    })
+                io.to(socketId).emit('update-token', { token: token })
+            } catch (err) {
+                if (err.name === 'TokenExpiredError') {
+                    let userId = userDetails._id
+                    let socketId = socketStore.getSocketIdFromUserId(userId)
+                    userDetails.token = '1234'
+                    const token = jwt.sign(
+                        {
+                            ...userDetails
+                        },
+                        process.env.KEY_TOKEN
+                        , {
+                            expiresIn: process.env.EXPIRE_TOKEN
+                        })
+                    io.to(socketId).emit('update-token', { token: token })
+                }
+            }
+        })
 
         setInterval(() => {
             let activeConnections = socketStore.getAllActiveConnections()
             socket.emit('all-active-user', { activeUsers: activeConnections })
-        }, 10000)
+        }, 60000)
     })
 }
 

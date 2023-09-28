@@ -18,6 +18,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage })
 
+
 router.post('/upload-avatar', upload.single('avatar'), (req, res) => {
     try {
         const { destination, filename } = req.file
@@ -31,6 +32,29 @@ router.post('/upload-avatar', upload.single('avatar'), (req, res) => {
 })
 
 router.post('/update-info', auth, userControllers.updateInfo)
+
+const storageImgMessage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/imgMessage/')
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname))
+    }
+})
+const uploadImgMessage = multer({ storage: storageImgMessage })
+
+router.post('/upload-image-message', uploadImgMessage.single('imgMessage'), (req, res) => {
+    try {
+        const { destination, filename } = req.file
+        const pathAvatar = '/' + destination + filename
+        return res.status(200).json({
+            path: pathAvatar
+        })
+    } catch (err) {
+        return res.status(405).send('Upload failed')
+    }
+})
 
 
 module.exports = router;

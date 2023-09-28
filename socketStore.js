@@ -11,15 +11,11 @@ const getInstantSocket = () => {
 }
 
 const addNewConnectedUser = (socketId, userId) => {
-    console.log('add new connected user')
     connectedUsers.set(socketId, userId)
-    console.log(connectedUsers)
 }
 
 const removeConnect = (socketId) => {
     connectedUsers.delete(socketId)
-    console.log(connectedUsers)
-    console.log('delete connected user')
 }
 
 const checkUserOnline = (userId) => {
@@ -58,9 +54,14 @@ const getSocketIdFromUserId = (userId) => {
     return activeConnections
 }
 
+const getConnectedUser = () => {
+    return connectedUsers
+}
+
 
 module.exports = {
     setInstantSocket, addNewConnectedUser,
     getInstantSocket, removeConnect,
-    checkUserOnline, getActiveConnections, getSocketIdFromUserId, getAllActiveConnections
+    checkUserOnline, getActiveConnections, getSocketIdFromUserId,
+    getAllActiveConnections, getConnectedUser
 }

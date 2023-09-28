@@ -6,7 +6,7 @@ const verifyTokenSocket = async (socket, next) => {
         const decoded = jwt.verify(token, process.env.KEY_TOKEN)
         socket.userDetails = decoded
     } catch (err) {
-        console.log(err, 'authSocket.js')
+        console.log('error authSocket.js')
         if (err.name === 'TokenExpiredError') {
             const socketError = new Error("TokenExpire")
             return next(socketError)
