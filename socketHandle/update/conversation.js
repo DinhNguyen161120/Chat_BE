@@ -7,7 +7,16 @@ const updateConversation = async (userId) => {
         if (check) {
             const conversations = await Conversation.find({
                 participants: userId
-            }).populate('messages').populate('participants', 'firstName lastName avatar _id')
+            })
+                .populate('participants', 'firstName lastName avatar _id')
+                .populate('messages')
+                .populate({
+                    path: 'messages',
+                    populate: {
+                        path: 'sender',
+                        select: '_id avatar firstName lastName'
+                    }
+                })
             const socketId = socketStore.getSocketIdFromUserId(userId)
             const io = socketStore.getInstantSocket()
             io.to(socketId).emit('update-conversation', { conversations })

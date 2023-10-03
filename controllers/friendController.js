@@ -63,10 +63,9 @@ const acceptInvitation = async (req, res) => {
         })
         if (conversation && conversation.participants.length == 2) {
             const newMessage = await Message.create({
-                senderId: senderId,
-                receiverId: receiverId,
-                isAnnounceFromServer: true,
-                typeAnnounce: 'acceptFriend',
+                sender: senderId,
+                conversation: conversation._id,
+                type: 'accept_friend',
                 date: new Date(),
                 status: '2'     //0: dang gui, 1: da gui, 2: da nhan, 3: da xem.
             })
@@ -74,20 +73,19 @@ const acceptInvitation = async (req, res) => {
             conversation.messages.push(newMessage._id)
             await conversation.save()
         } else {
+            const firstConversation = await Conversation.create({
+                participants: [senderId, receiverId],
+                messages: [],
+                date: new Date()
+            })
             const firstMessage = await Message.create({
-                senderId: senderId,
-                receiverId: receiverId,
-                isAnnounceFromServer: true,
-                typeAnnounce: 'acceptFriend',
+                sender: senderId,
+                type: 'accept_friend',
                 date: new Date(),
                 status: '2'     //0: dang gui, 1: da gui, 2: da nhan, 3: da xem.
             })
-
-            const firstConversation = await Conversation.create({
-                participants: [senderId, receiverId],
-                messages: [firstMessage._id],
-                date: new Date()
-            })
+            firstConversation.messages.push(firstMessage._id)
+            firstConversation.save()
         }
         friendUpdates.updateFriendPendingInvitation(receiverId.toString())
         friendUpdates.updateListFriends(receiverId.toString())

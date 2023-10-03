@@ -6,7 +6,8 @@ const updateStatusMessage = require('./update/conversation')
 
 const handleDirectMessage = async (messageData) => {
     try {
-        let { senderId, receiverId, content, type, date, status } = messageData
+        let { sender, receiverId, content, type, date, status } = messageData
+        let senderId = sender._id
         status = 1
         // cap nhat trang thai message dua tren hoat dong cua user
         let check = socketStore.checkUserOnline(receiverId)
@@ -15,8 +16,7 @@ const handleDirectMessage = async (messageData) => {
         }
 
         let message = await Message.create({
-            senderId,
-            receiverId,
+            sender,
             content,
             type,
             date,
