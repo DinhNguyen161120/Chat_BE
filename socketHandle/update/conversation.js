@@ -17,6 +17,13 @@ const updateConversation = async (userId) => {
                         select: '_id avatar firstName lastName'
                     }
                 })
+                .populate({
+                    path: 'messages',
+                    populate: {
+                        path: 'conversation',
+                        select: '_id'
+                    }
+                })
             const socketId = socketStore.getSocketIdFromUserId(userId)
             const io = socketStore.getInstantSocket()
             io.to(socketId).emit('update-conversation', { conversations })
@@ -25,38 +32,41 @@ const updateConversation = async (userId) => {
         console.log(err, 'updateConversation')
     }
 }
-const updateWatchedMessageStatusInReduxStore = (senderId, receiverId, conversationId) => {
+const updateWatchedMessageStatusInReduxStore = (listMessage, conversationId) => {
     try {
+        let senderId = listMessage[0].sender._id
         let check = socketStore.checkUserOnline(senderId)
         if (check) {
             const socketId = socketStore.getSocketIdFromUserId(senderId)
             const io = socketStore.getInstantSocket()
-            io.to(socketId).emit('update-watched-status-message-in-redux-store', { senderId, receiverId, conversationId })
+            io.to(socketId).emit('update-watched-status-message-in-redux-store', { listMessage, conversationId })
         }
     } catch (e) {
         console.log(e)
     }
 }
-const updateSentMessageStatusInReduxStore = (senderId, receiverId, conversationId) => {
+const updateSentMessageStatusInReduxStore = (listMessage, conversationId) => {
     try {
+        let senderId = listMessage[0].sender._id
         let check = socketStore.checkUserOnline(senderId)
         if (check) {
             const socketId = socketStore.getSocketIdFromUserId(senderId)
             const io = socketStore.getInstantSocket()
-            io.to(socketId).emit('update-sent-status-message-in-redux-store', { senderId, receiverId, conversationId })
+            io.to(socketId).emit('update-sent-status-message-in-redux-store', { listMessage, conversationId })
         }
     } catch (e) {
         console.log(e)
     }
 }
 
-const updateReceivedMessageStatusInReduxStore = (senderId, receiverId, conversationId) => {
+const updateReceivedMessageStatusInReduxStore = (listMessage, conversationId) => {
     try {
+        let senderId = listMessage[0].sender._id
         let check = socketStore.checkUserOnline(senderId)
         if (check) {
             const socketId = socketStore.getSocketIdFromUserId(senderId)
             const io = socketStore.getInstantSocket()
-            io.to(socketId).emit('update-received-status-message-in-redux-store', { senderId, receiverId, conversationId })
+            io.to(socketId).emit('update-received-status-message-in-redux-store', { listMessage, conversationId })
         }
     } catch (e) {
         console.log(e)

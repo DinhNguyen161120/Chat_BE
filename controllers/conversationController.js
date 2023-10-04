@@ -5,28 +5,34 @@ const conversationUpdate = require('../socketHandle/update/conversation')
 
 let createNewConversation = async (req, res) => {
     try {
-        let { participants, message } = req.body
+        let { sender, receiverId, content, type, date } = req.body
         let status = 1
         // cap nhat trang thai message dua tren hoat dong cua user
-        let check = socketStore.checkUserOnline(message.receiverId)
+        let check = socketStore.checkUserOnline(receiverId)
         if (check) {
             status = 2
         }
 
-        delete message._id
-        let newMessage = await messageModel.create({
-            ...message,
-            status: status
-        })
         let newConversation = await conversationModel.create({
-            participants: participants,
-            messages: [newMessage._id],
+            participants: [sender._id, receiverId],
+            messages: [],
             date: new Date()
         })
 
-        participants.forEach(userId => {
-            conversationUpdate.updateConversation(userId)
+        let newMessage = await messageModel.create({
+            sender,
+            content,
+            conversation: newConversation._id,
+            type,
+            date,
+            status
         })
+        newConversation.messages.push(newMessage._id)
+        await newConversation.save()
+
+        conversationUpdate.updateConversation(sender._id)
+        conversationUpdate.updateConversation(receiverId)
+
         return res.status(200).json({
             conversation: newConversation
         })

@@ -41,16 +41,16 @@ const registerSocketServer = (server) => {
             messageUpdate.handleDirectMessage(data)
         })
         socket.on('message-watched', (data) => {
-            let { senderId, receiverId, conversationId } = data
-            updateMessage.updateWatchedMessageStatus(senderId, receiverId, conversationId)
+            let { listMessage, conversationId } = data
+            updateMessage.updateWatchedMessageStatus(listMessage, conversationId)
         })
         socket.on('message-received', (data) => {
-            let { senderId, receiverId, conversationId } = data
-            updateMessage.updateReceivedMessageStatus(senderId, receiverId, conversationId)
+            let { listMessage, conversationId } = data
+            updateMessage.updateReceivedMessageStatus(listMessage, conversationId)
         })
         socket.on('check-token-expire', (userDetails) => {
             let connect = socketStore.getConnectedUser()
-            console.log(connect)
+            // console.log(connect)
             try {
                 const decoded = jwt.verify(userDetails.token, process.env.KEY_TOKEN)
                 let userId = userDetails._id

@@ -6,46 +6,41 @@ const updateStatusMessage = require('./update/conversation')
 
 const handleDirectMessage = async (messageData) => {
     try {
-        let { sender, receiverId, content, type, date, status } = messageData
-        let senderId = sender._id
-        status = 1
+        let { sender, receiverId, conversation, content, type, date, status } = messageData
+        status = '1'
         // cap nhat trang thai message dua tren hoat dong cua user
         let check = socketStore.checkUserOnline(receiverId)
         if (check) {
-            status = 2
+            status = '2'
         }
 
-        let message = await Message.create({
-            sender,
-            content,
-            type,
-            date,
-            status
-        })
-
-        let conversation = await Conversation.findOne({
-            $or: [
-                { participants: [senderId, receiverId] },
-                { participants: [receiverId, senderId] }
-            ]
-        })
+        let conversationCurrent = await Conversation.findOne({ _id: conversation._id })
+        let listMessage = []
         let conversationId = ''
-        if (conversation) {
-            conversationId = conversation._id
-            conversation.messages.push(message._id)
-            await conversation.save()
-        } else {
-            let newConversation = await Conversation.create({
-                participants: [senderId, receiverId],
-                messages: [message._id],
-                date: new Date()
+        if (conversationCurrent) {
+            let message = await Message.create({
+                sender: sender._id,
+                content,
+                conversation: conversation._id,
+                type,
+                date,
+                status
             })
-            conversationId = newConversation._id
+            listMessage.push({
+                _id: message._id,
+                sender: {
+                    _id: sender._id
+                },
+                date: message.date
+            })
+            conversationId = conversationCurrent._id
+            conversationCurrent.messages.push(message._id)
+            await conversationCurrent.save()
         }
-        if (status === 1) {
-            updateStatusMessage.updateSentMessageStatusInReduxStore(senderId, receiverId, conversationId)
-        } else if (status === 2) {
-            updateStatusMessage.updateReceivedMessageStatusInReduxStore(senderId, receiverId, conversationId)
+        if (status === '1') {
+            updateStatusMessage.updateSentMessageStatusInReduxStore(listMessage, conversationId)
+        } else if (status === '2') {
+            updateStatusMessage.updateReceivedMessageStatusInReduxStore(listMessage, conversationId)
         }
         conversationUpdate.updateConversation(receiverId)
     } catch (err) {

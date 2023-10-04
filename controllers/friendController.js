@@ -18,6 +18,17 @@ const friendInvitation = async (req, res) => {
         if (invitationExist) {
             return res.status(406).send("Bạn đã gửi lời mời kết bạn trước đó")
         }
+
+
+        const invitationExist2 = await FriendInvitation.findOne({
+            senderId: receiverId,
+            receiverId: senderId
+        })
+
+        if (invitationExist2) {
+            return res.status(406).send("Bạn đã nhận lời mời kết bạn từ người này trước đó")
+        }
+
         await FriendInvitation.create({
             senderId: senderId,
             receiverId: receiverId,

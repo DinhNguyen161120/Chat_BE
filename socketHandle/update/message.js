@@ -1,19 +1,27 @@
 const Message = require('../../models/message')
 const conversation = require('../update/conversation')
 
-const updateWatchedMessageStatus = async (senderId, receiverId, conversationId) => {
+const updateWatchedMessageStatus = async (listMessage, conversationId) => {
     try {
-        await Message.updateMany({ receiverId, senderId, status: 2 }, { status: 3 })
-        conversation.updateWatchedMessageStatusInReduxStore(senderId, receiverId, conversationId)
+        listMessage.forEach(async (mes) => {
+            let mesDb = await Message.findById(mes._id)
+            mesDb.status = '3'
+            mesDb.save()
+        });
+        conversation.updateWatchedMessageStatusInReduxStore(listMessage, conversationId)
     } catch (err) {
         console.log(err, 'updateWatchedMessageStatus')
     }
 }
 
-const updateReceivedMessageStatus = async (senderId, receiverId, conversationId) => {
+const updateReceivedMessageStatus = async (listMessage, conversationId) => {
     try {
-        await Message.updateMany({ receiverId, senderId, status: 1 }, { status: 2 })
-        conversation.updateReceivedMessageStatusInReduxStore(senderId, receiverId, conversationId)
+        listMessage.forEach(async (mes) => {
+            let mesDb = await Message.findById(mes._id)
+            mesDb.status = '2'
+            mesDb.save()
+        });
+        conversation.updateReceivedMessageStatusInReduxStore(listMessage, conversationId)
     } catch (err) {
         console.log(err, 'updateReceivedMessageStatus')
     }
