@@ -1,4 +1,6 @@
 
+const fs = require('fs')
+
 const uploadAvatar = (req, res) => {
     try {
         const { destination, filename } = req.file
@@ -25,6 +27,19 @@ const uploadImageMessage = (req, res) => {
     }
 }
 
+let uploadFile = (req, res) => {
+    try {
+        const { destination, filename } = req.file
+        let host = req.protocol + '://' + req.get('host')
+        const pathAvatar = destination.replace('public', host) + filename
+        return res.status(200).json({
+            path: pathAvatar
+        })
+    } catch (err) {
+        return res.status(405).send('Upload failed')
+    }
+}
+
 module.exports = {
-    uploadAvatar, uploadImageMessage
+    uploadAvatar, uploadImageMessage, uploadFile
 }
