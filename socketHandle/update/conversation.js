@@ -32,6 +32,7 @@ const updateConversation = async (userId) => {
         console.log(err, 'updateConversation')
     }
 }
+
 const updateWatchedMessageStatusInReduxStore = (listMessage, conversationId) => {
     try {
         let senderId = listMessage[0].sender._id

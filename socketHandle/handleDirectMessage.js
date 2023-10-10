@@ -3,6 +3,7 @@ const Conversation = require('../models/conversation')
 const conversationUpdate = require('../socketHandle/update/conversation')
 const socketStore = require('../socketStore')
 const updateStatusMessage = require('./update/conversation')
+const messageUpdate = require('../socketHandle/update/message')
 
 const handleDirectMessage = async (messageData) => {
     try {
@@ -17,6 +18,7 @@ const handleDirectMessage = async (messageData) => {
         let conversationCurrent = await Conversation.findOne({ _id: conversation._id })
         let listMessage = []
         let conversationId = ''
+        let messageId = ''
         if (conversationCurrent) {
             let message = await Message.create({
                 sender: sender._id,
@@ -33,6 +35,7 @@ const handleDirectMessage = async (messageData) => {
                 },
                 date: message.date
             })
+            messageId = message._id
             conversationId = conversationCurrent._id
             conversationCurrent.messages.push(message._id)
             await conversationCurrent.save()
@@ -42,7 +45,7 @@ const handleDirectMessage = async (messageData) => {
         } else if (status === '2') {
             updateStatusMessage.updateReceivedMessageStatusInReduxStore(listMessage, conversationId)
         }
-        conversationUpdate.updateConversation(receiverId)
+        messageUpdate.sendOneMessage(messageId, receiverId)
     } catch (err) {
         console.log(err, 'sockethandle/update/message.js')
     }
