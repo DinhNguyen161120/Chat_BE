@@ -35,7 +35,7 @@ const sendOneMessage = async (messageId, receiverId) => {
             let message = await Message.findById(messageId)
                 .populate({
                     path: 'sender',
-                    select: '_id'
+                    select: '_id avatar firstName lastName'
                 })
                 .populate({
                     path: 'conversation',
