@@ -4,7 +4,7 @@ const fs = require('fs')
 const uploadAvatar = (req, res) => {
     try {
         const { destination, filename } = req.file
-        let host = req.protocol + '://' + req.get('host')
+        let host = process.env.PROTOCOL + req.get('host')
         const pathAvatar = destination.replace('public', host) + filename
         return res.status(200).json({
             avatar: pathAvatar
@@ -17,7 +17,7 @@ const uploadAvatar = (req, res) => {
 const uploadImageMessage = (req, res) => {
     try {
         const { destination, filename } = req.file
-        let host = req.protocol + '://' + req.get('host')
+        let host = process.env.PROTOCOL + req.get('host')
         const pathAvatar = destination.replace('public', host) + filename
         return res.status(200).json({
             path: pathAvatar
@@ -29,8 +29,9 @@ const uploadImageMessage = (req, res) => {
 
 let uploadFile = (req, res) => {
     try {
+        console.log(req.header)
         const { destination, filename } = req.file
-        let host = req.protocol + '://' + req.get('host')
+        let host = process.env.PROTOCOL + req.get('host')
         const pathAvatar = destination.replace('public', host) + filename
         return res.status(200).json({
             path: pathAvatar

@@ -15,6 +15,7 @@ const conversationRoutes = require('./routes/conversationRoutes')
 const fileRoutes = require('./routes/fileRouter')
 
 const port = process.env.PORT
+app.enable('trust proxy');
 
 app.use(express.json())
 app.use(cors())
@@ -26,7 +27,8 @@ app.use('/conversation', conversationRoutes)
 app.use('/file', fileRoutes)
 
 app.get('/', (req, res) => {
-    let host = req.protocol + '://' + req.get('host') + req.originalUrl
+    console.log(req.secure)
+    let host = process.env.PROTOCOL + req.get('host') + req.originalUrl
     res.send('Hello World!' + host)
 })
 const Conversation = require('./models/conversation')
