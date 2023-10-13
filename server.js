@@ -29,6 +29,39 @@ app.get('/', (req, res) => {
     let host = req.protocol + '://' + req.get('host') + req.originalUrl
     res.send('Hello World!' + host)
 })
+const Conversation = require('./models/conversation')
+app.get('/test-query-limit', async (req, res) => {
+    try {
+        const conversations = await Conversation.find({
+            _id: '65278ee78119ce44cca85af3'
+        })
+            .populate('participants', 'firstName lastName avatar _id')
+            .populate('messages')
+            .populate({
+                path: 'messages',
+                populate: {
+                    path: 'sender',
+                    select: '_id avatar firstName lastName'
+                }
+            })
+            .populate({
+                path: 'messages',
+                populate: {
+                    path: 'conversation',
+                    select: '_id'
+                },
+                options: {
+                    limit: 10,
+                    sort: { 'date': -1 },
+                }
+            })
+        res.json(conversations)
+    }
+    catch (e) {
+        console.log(e)
+        res.send('err')
+    }
+})
 
 const server = http.createServer(app)
 
