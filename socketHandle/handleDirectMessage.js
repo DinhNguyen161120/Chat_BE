@@ -39,6 +39,9 @@ const handleDirectMessage = async (messageData) => {
             conversationId = conversationCurrent._id
             conversationCurrent.messages.push(message._id)
             await conversationCurrent.save()
+            if (conversationCurrent.messages.length == 1) {
+                conversationUpdate.updateConversation(receiverId)
+            }
         }
         if (status === '1') {
             updateStatusMessage.updateSentMessageStatusInReduxStore(listMessage, conversationId)

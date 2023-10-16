@@ -41,7 +41,43 @@ let createNewConversation = async (req, res) => {
         res.status(500).send('Error server')
     }
 }
+let createConversationWithMessage = async (req, res) => {
+    try {
+        let { senderId, receiverId } = req.body
+        let newConversation = await conversationModel.create({
+            participants: [senderId, receiverId],
+            messages: [],
+            date: new Date()
+        })
+        // conversationUpdate.updateConversation(senderId)
+        res.status(200).json({
+            conversation: newConversation
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).send('Error server')
+    }
 
+}
+const deleteConversation = async (req, res) => {
+    try {
+        let { conversationId } = req.body
+        let conversation = await conversationModel.findByIdAndDelete(conversationId)
+        let participants = conversation.participants
+
+        participants.forEach(id => {
+            conversationUpdate.updateConversation(id.toString())
+        })
+
+        messageModel.deleteMany({ conversation: conversationId.toString() })
+
+        res.status(200).send('delete successfully')
+    } catch (err) {
+        res.status(500).send('Error server')
+    }
+}
 module.exports = {
-    createNewConversation
+    createNewConversation,
+    createConversationWithMessage,
+    deleteConversation
 }
