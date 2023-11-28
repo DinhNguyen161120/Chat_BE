@@ -84,7 +84,7 @@ const server = http.createServer(app)
 
 socketServer.registerSocketServer(server)
 
-mongoose.connect(process.env.MONGO_DEV)
+mongoose.connect(process.env.MONGO_URI)
     .then(() => {
         server.listen(port, () => {
             console.log(`Example server listening on port ${port}`)
