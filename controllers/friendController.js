@@ -16,9 +16,10 @@ const friendInvitation = async (req, res) => {
         })
 
         if (invitationExist) {
-            return res.status(406).send("Bạn đã gửi lời mời kết bạn trước đó")
+            return res.status(406).json({
+                code: 'friendInvitation_0'
+            })
         }
-
 
         const invitationExist2 = await FriendInvitation.findOne({
             senderId: receiverId,
@@ -26,7 +27,9 @@ const friendInvitation = async (req, res) => {
         })
 
         if (invitationExist2) {
-            return res.status(406).send("Bạn đã nhận lời mời kết bạn từ người này trước đó")
+            return res.status(406).json({
+                code: 'friendInvitation_1'
+            })
         }
 
         await FriendInvitation.create({
@@ -35,10 +38,14 @@ const friendInvitation = async (req, res) => {
             date: new Date()
         })
         friendUpdates.updateFriendPendingInvitation(receiverId.toString())
-        return res.status(200).send('Gửi lời mời kết bạn thành công')
+        return res.status(200).json({
+            code: 'friendInvitation_2'
+        })
     } catch (err) {
         console.log(err, 'friend invitation update')
-        return res.status(500).send("Đã có lỗi xảy ra. Vui lòng thử lại")
+        return res.status(500).json({
+            code: 'common_0'
+        })
     }
 }
 
@@ -157,12 +164,12 @@ const deleteFriend = async (req, res) => {
         friendUpdates.updateListFriends(userId)
         friendUpdates.updateListFriends(friendId)
 
-        return res.status(200).send('Xóa bạn thành công')
+        return res.status(200).json({
+            code: 'deleteFriend_0'
+        })
     } catch (err) {
-        console.log(err, 'delete Friend')
-        res.json({
-            errCode: true,
-            mes: 'Lỗi server vui lòng thử lại.'
+        return res.status(406).json({
+            code: 'common_0',
         })
     }
 }

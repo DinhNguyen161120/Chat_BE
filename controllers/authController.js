@@ -7,7 +7,10 @@ const register = async (req, res) => {
         const { email, password, firstName, lastName } = req.body
         const accountExit = await userModel.findOne({ email: email.toLowerCase() })
         if (accountExit) {
-            return res.status(409).send('Email đã được sử dụng')
+            // return res.status(409).send('Email đã được sử dụng')
+            return res.status(409).json({
+                code: 'register_0'
+            })
         }
         const encryptPassword = await bcrypt.hash(password, 10)
         const user = await userModel.create({
@@ -19,9 +22,13 @@ const register = async (req, res) => {
             birthday: new Date(),
             status: '0' // is active
         })
-        return res.status(201).send('Đăng kí tài khoản thành công')
+        return res.status(201).json({
+            code: 'register_1'
+        })
     } catch (err) {
-        return res.status(500).send('Đã xảy ra lỗi. Vui lòng thử lại')
+        return res.status(500).json({
+            code: 'common_0'
+        })
     }
 }
 
@@ -30,11 +37,15 @@ const login = async (req, res) => {
         const { email, password } = req.body
         const user = await userModel.findOne({ email: email.toLowerCase() })
         if (!user) {
-            return res.status(409).send("Email không chính xác")
+            return res.status(409).json({
+                code: 'login_0'
+            })
         }
         const checkPassword = bcrypt.compareSync(password, user.password)
         if (!checkPassword) {
-            return res.status(500).send('Mật khẩu không chính xác')
+            return res.status(500).json({
+                code: 'login_1'
+            })
         }
         const token = jwt.sign(
             {
@@ -59,10 +70,15 @@ const login = async (req, res) => {
             birthday: user.birthday,
             friends: user.friends
         }
-        return res.status(200).json(userDetails)
+        return res.status(200).json({
+            code: 'login_2',
+            userDetails: userDetails
+        })
     } catch (err) {
         console.log(err)
-        return res.status(500).send('Đã xảy ra lỗi. Vui lòng thử lại')
+        return res.status(500).json({
+            code: 'common_0'
+        })
     }
 }
 
