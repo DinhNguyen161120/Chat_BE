@@ -127,9 +127,8 @@ const findFriend = async (req, res) => {
         const { email } = req.body
         const user = await User.findOne({ email: email })
         if (!user) {
-            return res.json({
-                err: true,
-                mes: "Email chưa đăng kí tài khoản"
+            return res.status(406).json({
+                code: 'findFriend_0'
             })
         } else {
             user.password = ''
@@ -138,7 +137,9 @@ const findFriend = async (req, res) => {
 
     } catch (err) {
         console.log(err, 'friend invitation update')
-        return res.status(500).send("Đã có lỗi xảy ra. Vui lòng thử lại")
+        return res.status(406).json({
+            code: 'common_0',
+        })
     }
 }
 const deleteFriend = async (req, res) => {
