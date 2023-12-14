@@ -53,7 +53,53 @@ const handleDirectMessage = async (messageData) => {
         console.log(err, 'sockethandle/update/message.js')
     }
 }
+const handleDirectMessageGroup = async (messageData) => {
+    try {
+        let { sender, conversation, content, type, date, status } = messageData
+        status = '1'
+        let conversationCurrent = await Conversation.findOne({ _id: conversation._id })
+        let listMessage = []
+        let conversationId = ''
+        let messageId = ''
+        if (conversationCurrent) {
+            let message = await Message.create({
+                sender: sender._id,
+                content,
+                conversation: conversation._id,
+                type,
+                date,
+                status
+            })
+            listMessage.push({
+                _id: message._id,
+                sender: {
+                    _id: sender._id
+                },
+                date: message.date
+            })
+            messageId = message._id
+            conversationId = conversationCurrent._id
+            conversationCurrent.messages.push(message._id)
+            await conversationCurrent.save()
+            if (conversationCurrent.messages.length == 1) {
+                conversationUpdate.updateConversation(receiverId)
+            }
+        }
+        if (status === '1') {
+            updateStatusMessage.updateSentMessageStatusInReduxStore(listMessage, conversationId)
+        }
+        if (conversationCurrent?.participants) {
+            conversationCurrent?.participants.map((userId) => {
+                if (sender._id !== userId.toString()) {
+                    messageUpdate.sendOneMessage(messageId, userId.toString())
+                }
+            })
+        }
+    } catch (err) {
+        console.log(err, 'sockethandle/update/message.js')
+    }
+}
 
 module.exports = {
-    handleDirectMessage
+    handleDirectMessage, handleDirectMessageGroup
 }

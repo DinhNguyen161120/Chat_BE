@@ -7,7 +7,7 @@ let createNewConversation = async (req, res) => {
     try {
         let { sender, receiverId, content, type, date } = req.body
         let status = 1
-        // cap nhat trang thai message dua tren hoat dong cua user
+
         let check = socketStore.checkUserOnline(receiverId)
         if (check) {
             status = 2
@@ -76,8 +76,44 @@ const deleteConversation = async (req, res) => {
         res.status(500).send('Error server')
     }
 }
+const createNewConversationGroup = async (req, res) => {
+    try {
+        let { groupName, participants, leaderId } = req.body
+
+        let newConversation = await conversationModel.create({
+            participants,
+            groupName,
+            leader: leaderId,
+            date: Date.now()
+        })
+
+        let newMessage = await messageModel.create({
+            sender: leaderId,
+            content: '',
+            conversation: newConversation._id,
+            type: 'create_group',
+            date: Date.now(),
+            status: '0'
+        })
+
+        newConversation.messages.push(newMessage._id)
+        await newConversation.save()
+
+        participants.forEach(id => {
+            conversationUpdate.updateConversation(id.toString())
+        })
+
+        return res.status(200).json({
+            code: 'createGroup_0'
+        })
+    } catch (err) {
+        console.log(err, 'error conversation controller in func  createNewConversation')
+        res.status(500).send('Error server')
+    }
+}
 module.exports = {
     createNewConversation,
     createConversationWithMessage,
-    deleteConversation
+    deleteConversation,
+    createNewConversationGroup
 }

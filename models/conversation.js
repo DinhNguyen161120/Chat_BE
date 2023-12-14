@@ -8,10 +8,22 @@ const conversationSchema = new Schema({
     }],
     messages: [{
         type: Schema.Types.ObjectId,
-        ref: 'Message'
+        ref: 'Message',
+        default: []
     }],
     date: {
         type: Date
+    },
+    leader: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    groupName: {
+        type: String,
+        default: ''
+    },
+    avatarGroup: {
+        type: String
     }
 })
 

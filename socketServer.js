@@ -40,6 +40,9 @@ const registerSocketServer = (server) => {
         socket.on('send-message', (data) => {
             messageUpdate.handleDirectMessage(data)
         })
+        socket.on('send-message-group', (data) => {
+            messageUpdate.handleDirectMessageGroup(data)
+        })
         socket.on('message-watched', (data) => {
             let { listMessage, conversationId } = data
             updateMessage.updateWatchedMessageStatus(listMessage, conversationId)

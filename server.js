@@ -44,7 +44,7 @@ app.use('/file', fileRoutes)
 app.get('/', (req, res) => {
     console.log(req.secure)
     let host = process.env.PROTOCOL + req.get('host') + req.originalUrl
-    res.send('Hello World!' + host)
+    res.send('Hello World 123!' + host)
 })
 const Conversation = require('./models/conversation')
 // app.get('/test-query-limit', async (req, res) => {
@@ -84,7 +84,7 @@ const server = http.createServer(app)
 
 socketServer.registerSocketServer(server)
 
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_DEV)
     .then(() => {
         server.listen(port, () => {
             console.log(`Example server listening on port ${port}`)
