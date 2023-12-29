@@ -1,119 +1,31 @@
-const conversationModel = require('../models/conversation')
-const messageModel = require('../models/message')
-const socketStore = require('../socketStore')
-const conversationUpdate = require('../socketHandle/update/conversation')
+const { SuccessResponse } = require("../core/success.response");
+const ConversationService = require("../services/conversation.service");
 
-let createNewConversation = async (req, res) => {
-    try {
-        let { sender, receiverId, content, type, date } = req.body
-        let status = 1
-
-        let check = socketStore.checkUserOnline(receiverId)
-        if (check) {
-            status = 2
-        }
-
-        let newConversation = await conversationModel.create({
-            participants: [sender._id, receiverId],
-            messages: [],
-            date: new Date()
-        })
-
-        let newMessage = await messageModel.create({
-            sender,
-            content,
-            conversation: newConversation._id,
-            type,
-            date,
-            status
-        })
-        newConversation.messages.push(newMessage._id)
-        await newConversation.save()
-
-        conversationUpdate.updateConversation(sender._id)
-        conversationUpdate.updateConversation(receiverId)
-
-        return res.status(200).json({
-            conversation: newConversation
-        })
-    } catch (err) {
-        console.log(err, 'error conversation controller in func  createNewConversation')
-        res.status(500).send('Error server')
-    }
+class ConversationController {
+    createNewConversation = async (req, res, next) => {
+        new SuccessResponse({
+            message: "Create conversation success!",
+            metadata: await ConversationService.createNewConversation(req.body),
+        }).send(res);
+    };
+    createNewConversationWithoutMessage = async (req, res, next) => {
+        new SuccessResponse({
+            message: "Create conversation without message success!",
+            metadata: await ConversationService.createNewConversationWithoutMessage(req.body),
+        }).send(res);
+    };
+    deleteConversation = async (req, res, next) => {
+        new SuccessResponse({
+            message: "Delete conversation success!",
+            metadata: await ConversationService.deleteConversation(req.body),
+        }).send(res);
+    };
+    createGroup = async (req, res, next) => {
+        new SuccessResponse({
+            message: "Create group conversation success!",
+            metadata: await ConversationService.createGroup(req.body),
+        }).send(res);
+    };
 }
-let createConversationWithMessage = async (req, res) => {
-    try {
-        let { senderId, receiverId } = req.body
-        let newConversation = await conversationModel.create({
-            participants: [senderId, receiverId],
-            messages: [],
-            date: new Date()
-        })
-        // conversationUpdate.updateConversation(senderId)
-        res.status(200).json({
-            conversation: newConversation
-        })
-    } catch (err) {
-        console.log(err)
-        res.status(500).send('Error server')
-    }
 
-}
-const deleteConversation = async (req, res) => {
-    try {
-        let { conversationId } = req.body
-        let conversation = await conversationModel.findByIdAndDelete(conversationId)
-        let participants = conversation.participants
-
-        participants.forEach(id => {
-            conversationUpdate.updateConversation(id.toString())
-        })
-
-        messageModel.deleteMany({ conversation: conversationId.toString() })
-
-        res.status(200).send('delete successfully')
-    } catch (err) {
-        res.status(500).send('Error server')
-    }
-}
-const createNewConversationGroup = async (req, res) => {
-    try {
-        let { groupName, participants, leaderId } = req.body
-
-        let newConversation = await conversationModel.create({
-            participants,
-            groupName,
-            leader: leaderId,
-            date: Date.now()
-        })
-
-        let newMessage = await messageModel.create({
-            sender: leaderId,
-            content: '',
-            conversation: newConversation._id,
-            type: 'create_group',
-            date: Date.now(),
-            status: '0'
-        })
-
-        newConversation.messages.push(newMessage._id)
-        await newConversation.save()
-
-        participants.forEach(id => {
-            conversationUpdate.updateConversation(id.toString())
-        })
-
-        return res.status(200).json({
-            code: 'createGroup_0'
-        })
-    } catch (err) {
-        console.log(err, 'error conversation controller in func  createNewConversation')
-        res.status(500).send('Error server')
-    }
-}
-module.exports = {
-    createNewConversation,
-    createConversationWithMessage,
-    deleteConversation,
-    createNewConversationGroup
-}
+module.exports = new ConversationController();

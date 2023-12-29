@@ -1,22 +1,14 @@
-const User = require('../models/users')
+"use strict";
+const { SuccessResponse } = require("../core/success.response");
+const UserService = require("../services/user.service");
 
-const updateInfo = async (req, res) => {
-    try {
-        const userDetails = req.body
-        let user = await User.findById(userDetails._id)
-        user.firstName = userDetails.firstName
-        user.lastName = userDetails.lastName
-        user.avatar = userDetails.avatar
-        user.birthday = userDetails.birthday
-        user.sex = userDetails.sex
-        await user.save()
-        return res.status(200).send('Update success')
-    } catch (err) {
-        console.log(err)
-        return res.status(405).send('Update failed')
-    }
+class UserController {
+    updateInformation = async (req, res, next) => {
+        console.log(req.body);
+        new SuccessResponse({
+            message: "Update info success!",
+            metadata: await UserService.updateInformation(req.body),
+        }).send(res);
+    };
 }
-
-module.exports = {
-    updateInfo
-}
+module.exports = new UserController();

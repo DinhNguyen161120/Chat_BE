@@ -1,180 +1,36 @@
-const User = require('../models/users')
-const FriendInvitation = require('../models/friendInvitation')
-const Message = require('../models/message')
-const Conversation = require('../models/conversation')
-const friendUpdates = require('../socketHandle/update/friend')
-const conversationUpdate = require('../socketHandle/update/conversation')
-const userUpdate = require('../socketHandle/update/user')
-
-const friendInvitation = async (req, res) => {
-    try {
-        const { senderId, receiverId } = req.body
-
-        const invitationExist = await FriendInvitation.findOne({
-            senderId: senderId,
-            receiverId: receiverId
-        })
-
-        if (invitationExist) {
-            return res.status(406).json({
-                code: 'friendInvitation_0'
-            })
-        }
-
-        const invitationExist2 = await FriendInvitation.findOne({
-            senderId: receiverId,
-            receiverId: senderId
-        })
-
-        if (invitationExist2) {
-            return res.status(406).json({
-                code: 'friendInvitation_1'
-            })
-        }
-
-        await FriendInvitation.create({
-            senderId: senderId,
-            receiverId: receiverId,
-            date: new Date()
-        })
-        friendUpdates.updateFriendPendingInvitation(receiverId.toString())
-        return res.status(200).json({
-            code: 'friendInvitation_2'
-        })
-    } catch (err) {
-        console.log(err, 'friend invitation update')
-        return res.status(500).json({
-            code: 'common_0'
-        })
-    }
+"use strict";
+const { SuccessResponse } = require("../core/success.response");
+const FriendService = require("../services/friend.service");
+class FriendController {
+    findFriend = async (req, res, next) => {
+        new SuccessResponse({
+            message: "Find friend success!",
+            metadata: await FriendService.findFriendByEmail(req.body),
+        }).send(res);
+    };
+    friendInvitation = async (req, res, next) => {
+        new SuccessResponse({
+            message: "Invitation friend success!",
+            metadata: await FriendService.invitation(req.body),
+        }).send(res);
+    };
+    acceptFriend = async (req, res, next) => {
+        new SuccessResponse({
+            message: "Accept friend success!",
+            metadata: await FriendService.accept(req.body),
+        }).send(res);
+    };
+    rejectFriend = async (req, res, next) => {
+        new SuccessResponse({
+            message: "Reject friend success!",
+            metadata: await FriendService.reject(req.body),
+        }).send(res);
+    };
+    deleteFriend = async (req, res, next) => {
+        new SuccessResponse({
+            message: "Delete friend success!",
+            metadata: await FriendService.delete(req.body),
+        }).send(res);
+    };
 }
-
-const rejectInvitation = async (req, res) => {
-    try {
-        const invitationId = req.body._id
-        const receiverId = req.body.receiverId
-        await FriendInvitation.findByIdAndDelete(invitationId)
-        friendUpdates.updateFriendPendingInvitation(receiverId.toString())
-        return res.status(200).send('success')
-    } catch (err) {
-        return res.status(500).send('Đã xảy ra lỗi vui lòng thử lại')
-    }
-}
-
-const acceptInvitation = async (req, res) => {
-    try {
-        const { invitationId } = req.body
-        const invitation = await FriendInvitation.findByIdAndDelete(invitationId)
-        const { senderId, receiverId } = invitation
-        const senderUser = await User.findById(senderId.toString())
-        const receiverUser = await User.findById(receiverId.toString())
-        senderUser.friends.push(receiverId)
-        receiverUser.friends.push(senderId)
-        await senderUser.save()
-        await receiverUser.save()
-
-        let conversation = await Conversation.findOne({
-            $or: [
-                { participants: [senderId, receiverId] },
-                { participants: [receiverId, senderId] }
-            ]
-        })
-        if (conversation && conversation.participants.length == 2) {
-            const newMessage = await Message.create({
-                sender: senderId,
-                conversation: conversation._id,
-                type: 'accept_friend',
-                date: new Date(),
-                status: '2'     //0: dang gui, 1: da gui, 2: da nhan, 3: da xem.
-            })
-
-            conversation.messages.push(newMessage._id)
-            await conversation.save()
-        } else {
-            const firstConversation = await Conversation.create({
-                participants: [senderId, receiverId],
-                messages: [],
-                date: new Date()
-            })
-            const firstMessage = await Message.create({
-                sender: senderId,
-                type: 'accept_friend',
-                date: new Date(),
-                status: '2'     //0: dang gui, 1: da gui, 2: da nhan, 3: da xem.
-            })
-            firstConversation.messages.push(firstMessage._id)
-            firstConversation.save()
-        }
-        friendUpdates.updateFriendPendingInvitation(receiverId.toString())
-        friendUpdates.updateListFriends(receiverId.toString())
-        friendUpdates.updateListFriends(senderId.toString())
-
-        // update usedetails
-        userUpdate.updateFriendsInUserDetails(senderId.toString())
-        userUpdate.updateFriendsInUserDetails(receiverId.toString())
-
-        // update conversation
-        conversationUpdate.updateConversation(senderId.toString())
-        conversationUpdate.updateConversation(receiverId.toString())
-        return res.status(200).send('success')
-    } catch (err) {
-        return res.status(500).send('Đã xảy ra lỗi vui lòng thử lại')
-    }
-}
-
-const findFriend = async (req, res) => {
-    try {
-        const { email } = req.body
-        const user = await User.findOne({ email: email })
-        if (!user) {
-            return res.status(406).json({
-                code: 'findFriend_0'
-            })
-        } else {
-            user.password = ''
-            return res.json(user)
-        }
-
-    } catch (err) {
-        console.log(err, 'friend invitation update')
-        return res.status(406).json({
-            code: 'common_0',
-        })
-    }
-}
-const deleteFriend = async (req, res) => {
-    try {
-        let { userId, friendId } = req.body
-        let user = await User.findById(userId)
-        let newfriends = user.friends.filter(id => {
-            return id != friendId
-        })
-        user.friends = newfriends
-        await user.save()
-
-        let friend = await User.findById(friendId)
-        let newfriends2 = friend.friends.filter(id => {
-            return id != userId
-        })
-        friend.friends = newfriends2
-        await friend.save()
-
-        // update listfriend
-        userUpdate.updateFriendsInUserDetailsUseListFriendParameter(userId, newfriends)
-        userUpdate.updateFriendsInUserDetailsUseListFriendParameter(friendId, newfriends2)
-        friendUpdates.updateListFriends(userId)
-        friendUpdates.updateListFriends(friendId)
-
-        return res.status(200).json({
-            code: 'deleteFriend_0'
-        })
-    } catch (err) {
-        return res.status(406).json({
-            code: 'common_0',
-        })
-    }
-}
-module.exports = {
-    friendInvitation, rejectInvitation, acceptInvitation, findFriend,
-    deleteFriend
-}
+module.exports = new FriendController();

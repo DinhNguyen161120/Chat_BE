@@ -1,54 +1,57 @@
-const Message = require('../../models/message')
-const conversation = require('../update/conversation')
-const socketStore = require('../../socketStore')
+const conversation = require("../update/conversation");
+const socketStore = require("../../socketStore");
+const { messageModel } = require("../../models/message.model");
 
 const updateWatchedMessageStatus = async (listMessage, conversationId) => {
     try {
         listMessage.forEach(async (mes) => {
-            let mesDb = await Message.findById(mes._id)
-            mesDb.status = '3'
-            mesDb.save()
+            let mesDb = await messageModel.findById(mes._id);
+            mesDb.status = "3";
+            mesDb.save();
         });
-        conversation.updateWatchedMessageStatusInReduxStore(listMessage, conversationId)
+        conversation.updateWatchedMessageStatusInReduxStore(listMessage, conversationId);
     } catch (err) {
-        console.log(err, 'updateWatchedMessageStatus')
+        console.log(err, "updateWatchedMessageStatus");
     }
-}
+};
 
 const updateReceivedMessageStatus = async (listMessage, conversationId) => {
     try {
         listMessage.forEach(async (mes) => {
-            let mesDb = await Message.findById(mes._id)
-            mesDb.status = '2'
-            mesDb.save()
+            let mesDb = await messageModel.findById(mes._id);
+            mesDb.status = "2";
+            mesDb.save();
         });
-        conversation.updateReceivedMessageStatusInReduxStore(listMessage, conversationId)
+        conversation.updateReceivedMessageStatusInReduxStore(listMessage, conversationId);
     } catch (err) {
-        console.log(err, 'updateReceivedMessageStatus')
+        console.log(err, "updateReceivedMessageStatus");
     }
-}
+};
 
 const sendOneMessage = async (messageId, receiverId) => {
     try {
-        let check = socketStore.checkUserOnline(receiverId)
+        let check = socketStore.checkUserOnline(receiverId);
         if (check) {
-            let message = await Message.findById(messageId)
+            let message = await messageModel
+                .findById(messageId)
                 .populate({
-                    path: 'sender',
-                    select: '_id avatar firstName lastName'
+                    path: "sender",
+                    select: "_id avatar firstName lastName",
                 })
                 .populate({
-                    path: 'conversation',
-                    select: '_id'
-                })
-            const socketId = socketStore.getSocketIdFromUserId(receiverId)
-            const io = socketStore.getInstantSocket()
-            io.to(socketId).emit('sendOneMessage', { message: message })
+                    path: "conversation",
+                    select: "_id",
+                });
+            const socketId = socketStore.getSocketIdFromUserId(receiverId);
+            const io = socketStore.getInstantSocket();
+            io.to(socketId).emit("sendOneMessage", { message: message });
         }
     } catch (err) {
-        console.log(err, 'updateConversation')
+        console.log(err, "updateConversation");
     }
-}
+};
 module.exports = {
-    updateWatchedMessageStatus, updateReceivedMessageStatus, sendOneMessage
-}
+    updateWatchedMessageStatus,
+    updateReceivedMessageStatus,
+    sendOneMessage,
+};

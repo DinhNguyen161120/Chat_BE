@@ -13,13 +13,19 @@
         "không",
         "listfriend",
         "lòng",
+        "mogodb",
         "newfriends",
         "nhan",
         "nhat",
+        "Pharses",
         "thành",
         "trang",
         "tren",
         "usedetails",
         "zalo"
-    ]
+    ],
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
 }
