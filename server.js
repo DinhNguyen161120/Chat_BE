@@ -29,6 +29,13 @@ app.use("/api/ci-cd", (req, res, next) => {
         code: 200,
     });
 });
+app.use("/api/test", (req, res, next) => {
+    return res.json({
+        message: "success",
+        name: "/api/test",
+        code: 200,
+    });
+});
 
 app.use((req, res, next) => {
     const error = new Error("Not found");
