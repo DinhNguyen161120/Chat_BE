@@ -5,7 +5,6 @@ const { mongo_uri } = require("../config/config.mongodb");
 // const { countConnect } = require('../helpers/check.connect')
 
 const connectString = mongo_uri;
-console.log(connectString);
 class Database {
     constructor() {
         this.connect();

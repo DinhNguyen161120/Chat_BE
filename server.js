@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const mongoose = require("mongoose");
 const cors = require("cors");
 const http = require("http");
 const morgan = require("morgan");
@@ -16,11 +15,6 @@ app.enable("trust proxy");
 app.use(express.json());
 app.use(cors());
 app.use(express.static("public"));
-
-// const userRoutes = require("./routes/userRoutes");
-// const friendRoutes = require("./routes/friendRoutes");
-// const conversationRoutes = require("./routes/conversationRoutes");
-// const fileRoutes = require("./routes/fileRouter");
 
 // init database
 require("./dbs/init.mogodb");

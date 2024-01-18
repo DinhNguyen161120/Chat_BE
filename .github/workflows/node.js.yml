@@ -4,24 +4,37 @@
 name: Node.js CI
 
 on:
-  push:
-    branches: [ "master" ]
+    push:
+        branches: ["master"]
 
 jobs:
-  build:
+    build:
+        runs-on: self-hosted
 
-    runs-on: self-hosted
-
-    strategy:
-      matrix:
-        node-version: [20.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
+        strategy:
+            matrix:
+                node-version: [20.x]
+                # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        env:
+            PORT: ${{ secrets.HOST }}
+            MONGO_URI: ${{ secrets.MONGO_URI }}
+            KEY_TOKEN: ${{ secrets.KEY_TOKEN }}
+            EXPIRE_TOKEN: ${{ secrets.EXPIRE_TOKEN }}
+            PROTOCOL: ${{ secrets.PROTOCOL }}
+            NODE_ENV: ${{ secrets.NODE_ENV }}
+        steps:
+            - uses: actions/checkout@v3
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v3
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: "npm"
+            - run: npm ci
+            - run: touch .env
+            - run: echo PORT=$PORT >> .env
+            - run: echo MONGO_URI=$MONGO_URI >> .env
+            - run: echo KEY_TOKEN=$KEY_TOKEN >> .env
+            - run: echo EXPIRE_TOKEN=$EXPIRE_TOKEN >> .env
+            - run: echo PROTOCOL=$PROTOCOL >> .env
+            - run: echo NODE_ENV=$NODE_ENV >> .env
+            - run: pm2 restart chat-be
