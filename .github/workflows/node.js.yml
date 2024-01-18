@@ -37,4 +37,3 @@ jobs:
             - run: echo EXPIRE_TOKEN=$EXPIRE_TOKEN >> .env
             - run: echo PROTOCOL=$PROTOCOL >> .env
             - run: echo NODE_ENV=$NODE_ENV >> .env
-            - run: pm2 restart chat-be
