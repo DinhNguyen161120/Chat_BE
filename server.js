@@ -22,6 +22,14 @@ require("./dbs/init.mogodb");
 // init router
 app.use("/", require("./routes"));
 
+app.use("/api/ci-cd", (req, res, next) => {
+    return res.json({
+        message: "success",
+        name: "CI-CD",
+        code: 200,
+    });
+});
+
 app.use((req, res, next) => {
     const error = new Error("Not found");
     error.statusCode = 404;

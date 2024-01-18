@@ -16,7 +16,7 @@ jobs:
                 node-version: [20.x]
                 # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
         env:
-            PORT: ${{ secrets.HOST }}
+            PORT: ${{ secrets.PORT }}
             MONGO_URI: ${{ secrets.MONGO_URI }}
             KEY_TOKEN: ${{ secrets.KEY_TOKEN }}
             EXPIRE_TOKEN: ${{ secrets.EXPIRE_TOKEN }}
@@ -37,3 +37,4 @@ jobs:
             - run: echo EXPIRE_TOKEN=$EXPIRE_TOKEN >> .env
             - run: echo PROTOCOL=$PROTOCOL >> .env
             - run: echo NODE_ENV=$NODE_ENV >> .env
+            - run: pm2 restart chat-be
