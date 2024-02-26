@@ -51,7 +51,6 @@ const registerSocketServer = (server) => {
         });
         socket.on("check-token-expire", (userDetails) => {
             let connect = socketStore.getConnectedUser();
-            // console.log(connect)
             try {
                 const decoded = jwt.verify(userDetails.token, process.env.KEY_TOKEN);
                 let userId = userDetails._id;
