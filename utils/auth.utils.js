@@ -1,27 +1,18 @@
 const JWT = require("jsonwebtoken");
-const createTokenPair = async (payload, publicKey, privateKey) => {
+
+const createTokenPair = async (payload) => {
     try {
-        const accessToken = await JWT.sign(payload, publicKey, {
-            expiresIn: "2 days",
+        const accessToken = await JWT.sign(payload, process.env.KEY_TOKEN, {
+            expiresIn: process.env.EXPIRE_TOKEN,
         });
-        const refreshToken = await JWT.sign(payload, privateKey, {
-            expiresIn: "7 days",
+        const refreshToken = await JWT.sign(payload, process.env.KEY_REFRESH_TOKEN, {
+            expiresIn: process.env.EXPIRE_REFRESH_TOKEN,
         });
-
-        // JWT.verify(accessToken, publicKey, (err, decode) => {
-        //     if (err) {
-        //         console.log("error verify::", err);
-        //     } else {
-        //         console.log("decode verify::", decode);
-        //     }
-        // });
-
         return { accessToken, refreshToken };
     } catch (error) {
         console.log(error);
     }
 };
-
 module.exports = {
     createTokenPair,
 };

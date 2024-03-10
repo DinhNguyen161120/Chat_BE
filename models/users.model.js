@@ -19,6 +19,8 @@ const userSchema = new Schema(
         avatar: { type: String, default: "" },
         gender: { type: String, default: "" },
         birthday: { type: Date, default: Date.now() },
+        refreshTokensUsed: { type: Array, default: [] },
+        refreshToken: { type: String },
     },
     {
         timestamps: true,

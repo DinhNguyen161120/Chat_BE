@@ -60,7 +60,7 @@ class ConversationService {
             updateConversation(id.toString());
         });
 
-        messageModel.deleteMany({ conversation: conversationId.toString() });
+        await messageModel.deleteMany({ conversation: conversation._id });
 
         return {
             message: "delete successfully",

@@ -22,10 +22,11 @@ const registerSocketServer = (server) => {
 
     socketStore.setInstantSocket(io);
 
+    // console.log("create server");
     io.on("connection", (socket) => {
         const userDetails = socket.handshake.auth?.userDetails;
         handleNewConnected(socket, userDetails);
-
+        // console.log("new connect", userDetails._id);
         updateConversation(userDetails._id);
         updateListFriends(userDetails._id);
         let activeConnections = socketStore.getAllActiveConnections();
@@ -49,25 +50,27 @@ const registerSocketServer = (server) => {
             let { listMessage, conversationId } = data;
             updateMessage.updateReceivedMessageStatus(listMessage, conversationId);
         });
-        socket.on("check-token-expire", (userDetails) => {
+        socket.on("check-token-expire", ({ accessToken, refreshToken }) => {
             let connect = socketStore.getConnectedUser();
             try {
-                const decoded = jwt.verify(userDetails.token, process.env.KEY_TOKEN);
-                let userId = userDetails._id;
-                let socketId = socketStore.getSocketIdFromUserId(userId);
-                userDetails.token = "1234";
-                const token = jwt.sign(
-                    {
-                        ...userDetails,
-                    },
-                    process.env.KEY_TOKEN,
-                    {
-                        expiresIn: process.env.EXPIRE_TOKEN,
-                    },
-                );
-                io.to(socketId).emit("update-token", { token: token });
+                const decoded = jwt.verify(accessToken, process.env.KEY_TOKEN);
+                console.log(decoded);
+                // let userId = userDetails._id;
+                // let socketId = socketStore.getSocketIdFromUserId(userId);
+                // userDetails.token = "1234";
+                // const token = jwt.sign(
+                //     {
+                //         ...userDetails,
+                //     },
+                //     process.env.KEY_TOKEN,
+                //     {
+                //         expiresIn: process.env.EXPIRE_TOKEN,
+                //     },
+                // );
+                // io.to(socketId).emit("update-token", { token: token });
             } catch (err) {
                 if (err.name === "TokenExpiredError") {
+                    console.log(err.name);
                     let userId = userDetails._id;
                     let socketId = socketStore.getSocketIdFromUserId(userId);
                     userDetails.token = "1234";

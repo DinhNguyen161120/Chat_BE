@@ -1,67 +1,68 @@
-
-const connectedUsers = new Map()
-let io = null
+const connectedUsers = new Map();
+let io = null;
 
 const setInstantSocket = (ioInstant) => {
-    io = ioInstant
-}
+    io = ioInstant;
+};
 
 const getInstantSocket = () => {
-    return io
-}
+    return io;
+};
 
 const addNewConnectedUser = (socketId, userId) => {
-    connectedUsers.set(socketId, userId)
-}
+    connectedUsers.set(socketId, userId);
+};
 
 const removeConnect = (socketId) => {
-    connectedUsers.delete(socketId)
-}
+    connectedUsers.delete(socketId);
+};
 
 const checkUserOnline = (userId) => {
-    let check = false
+    let check = false;
     connectedUsers.forEach((value, key) => {
         if (value === userId) {
-            check = true
+            check = true;
         }
-    })
-    return check
-}
+    });
+    return check;
+};
 
 const getActiveConnections = (userId) => {
-    const activeConnections = []
+    const activeConnections = [];
     connectedUsers.forEach((value, key) => {
-        if (value === userId)
-            activeConnections.push(key)
-    })
-    return activeConnections
-}
+        if (value === userId) activeConnections.push(key);
+    });
+    return activeConnections;
+};
 
 const getAllActiveConnections = () => {
-    const activeConnections = []
+    const activeConnections = [];
     connectedUsers.forEach((value, key) => {
-        activeConnections.push(value)
-    })
-    return activeConnections
-}
+        activeConnections.push(value);
+    });
+    return activeConnections;
+};
 
 const getSocketIdFromUserId = (userId) => {
-    let activeConnections = ''
+    let activeConnections = "";
     connectedUsers.forEach((value, key) => {
-        if (value === userId)
-            activeConnections = key
-    })
-    return activeConnections
-}
+        if (value === userId) activeConnections = key;
+    });
+    return activeConnections;
+};
 
 const getConnectedUser = () => {
-    return connectedUsers
-}
-
+    return connectedUsers;
+};
 
 module.exports = {
-    setInstantSocket, addNewConnectedUser,
-    getInstantSocket, removeConnect,
-    checkUserOnline, getActiveConnections, getSocketIdFromUserId,
-    getAllActiveConnections, getConnectedUser
-}
+    setInstantSocket,
+    addNewConnectedUser,
+    getInstantSocket,
+    removeConnect,
+    checkUserOnline,
+    getActiveConnections,
+    getSocketIdFromUserId,
+    getAllActiveConnections,
+    getConnectedUser,
+};

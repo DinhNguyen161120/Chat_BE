@@ -8,6 +8,13 @@ class ConflictRequestError extends Error {
         this.code = code;
     }
 }
+class ForbiddenError extends Error {
+    constructor(message = ReasonPhrases.FORBIDDEN, code = "", statusCode = StatusCodes.FORBIDDEN) {
+        super(message);
+        this.statusCode = statusCode;
+        this.code = code;
+    }
+}
 class BadRequestError extends Error {
     constructor(
         message = ReasonPhrases.BAD_REQUEST,
@@ -23,4 +30,5 @@ class BadRequestError extends Error {
 module.exports = {
     ConflictRequestError,
     BadRequestError,
+    ForbiddenError,
 };

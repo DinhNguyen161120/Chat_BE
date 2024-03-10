@@ -6,6 +6,6 @@ const AccessController = require("../../controllers/accessController");
 
 router.post("/register", asyncHandler(AccessController.register));
 router.post("/login", asyncHandler(AccessController.login));
-// router.post("/refresh-token", accessController.refreshToken);
+router.post("/refresh-token", AccessController.refreshToken);
 
 module.exports = router;
